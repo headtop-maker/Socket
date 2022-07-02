@@ -10,7 +10,7 @@ export default function ClientScreen() {
       <Text>ClientScreen</Text>
       <CustomButton
         onPress={() => NativeMethods.openFile()}
-        title="Отправить файл"
+        title="Отправить файл" //for git
       />
     </View>
   );
