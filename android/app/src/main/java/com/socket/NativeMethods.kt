@@ -4,6 +4,7 @@ import android.widget.Toast
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.modules.core.DeviceEventManagerModule
 
 import android.app.Activity
 import android.content.Intent
@@ -20,6 +21,15 @@ import java.io.*
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.UiThreadUtil.runOnUiThread
+
+import com.facebook.react.bridge.WritableMap
+import com.th3rdwave.safeareacontext.getReactContext
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+
+
+
 
 
 class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaModule(reactContext){
@@ -29,6 +39,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
     private val DURATION_LONG_KEY = "LONG"
     val PICK_PDF_FILE = 2
     var fileType = ""
+    var mEmitter: RCTDeviceEventEmitter? = null
 
     override fun getName(): String {
         return "NativeMethods"
@@ -41,11 +52,21 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
         return constants
     }
 
+
+
+    fun sendEvent(eventName:String,message:String){
+        val params = Arguments.createMap()
+        params.putString("message",message)
+        if(mEmitter == null){
+            mEmitter= reactApplicationContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        }
+        mEmitter?.emit(eventName,params)
+    }
+
     @ReactMethod
     fun show(message:String,duration: Int){
         Toast.makeText(reactApplicationContext,message,duration).show()
     }
-
 
     @ReactMethod
     fun startMinWebServer(){
@@ -86,9 +107,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                     Log.d("URINative", cursor?.getString(2).toString())
                     val getFileType = cursor?.getString(2)?.split(".")!![1]
                     thread {
-                        if (uri != null) {
-                            clientType(getFileType, uri);
-                        }
+                        clientType(getFileType, uri)
                     }
                 }
 
@@ -144,16 +163,23 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                 var outFileStream =
                     FileOutputStream("/storage/emulated/0/Download/UploadFile${UUID.randomUUID()}.${fileType}")
                 var countBytes: Int
+//                sendEvent("count","start")
                 var i = 0;
+                runOnUiThread(Runnable {
+                    sendEvent("count","start")
+                })
                 do {
                     countBytes = inStream.read()
                     if (countBytes != -1) {
                         outFileStream.write(countBytes)
-                        i++
+//                        i++
 
                     } else {
                         println("server receive file")
                         Log.d("URINative","server receive file")
+                        runOnUiThread(Runnable {
+                            sendEvent("count","stop")
+                        })
                         writeLoop = false
                         outFileStream.close()
                     }
@@ -194,7 +220,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
     fun clientFile(uri: Uri) {
         Executors.newSingleThreadExecutor().execute {
             var sendLoop = true
-            var client = Socket("192.168.1.150", 9999)
+            var client = Socket("192.168.0.103", 9999)
 
 //            var file = FileInputStream("/storage/emulated/0/Download/uv2021psn.pdf")
             var file = uri.let { it1 -> reactApplicationContext.contentResolver.openInputStream(it1) }
@@ -221,7 +247,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
     }
     fun clientType(fileType: String, uri: Uri) {
         Executors.newSingleThreadExecutor().execute {
-            val client = Socket("192.168.1.150", 9998)
+            val client = Socket("192.168.0.103", 9998)
             val bufferedWriter = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
             val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
             bufferedWriter.write(fileType) // перенос строки очень важен
