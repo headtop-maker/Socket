@@ -10,7 +10,7 @@ export default function ServerScreen() {
     <View>
       <Text>ServerScreen</Text>
       <CustomButton
-        onPress={() => NativeMethods.show('Нет данных об устройстве', 5000)}
+        onPress={() => NativeMethods.startFileTypeServers()}
         title="Включить сервер"
       />
       <CustomButton
