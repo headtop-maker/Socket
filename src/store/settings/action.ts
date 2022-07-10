@@ -1,9 +1,19 @@
+import {IConnectionState} from './types';
+
 export enum ActionType {
   setAccuracy = 'SET_ACCURACY',
   setDeviceId = 'SET_DEVICE_ID',
   setRemoteDeviceId = 'SET_REMOTE_DEVICE_ID',
   setShowInputModal = 'SET_SHOW_INPUT_MODAL',
+  setConnectionSate = 'SET_CONNECTION_STATE',
 }
+
+export const setConnectionState = (data: IConnectionState) => {
+  return {
+    type: ActionType.setConnectionSate,
+    payload: data,
+  };
+};
 
 export const setAccuracy = (accuracy: number) => {
   return {

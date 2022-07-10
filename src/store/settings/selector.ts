@@ -10,3 +10,12 @@ export const getRemoteDeviceId = (state: TState) =>
 
 export const getShowInputModal = (state: TState) =>
   state.settingFormData.showInputModal;
+
+export const getConnectionType = (state: TState) =>
+  state.settingFormData.connectionSate.type;
+
+export const getConnectionConnected = (state: TState) =>
+  state.settingFormData.connectionSate.isConnected;
+
+export const getIpAddress = (state: TState) =>
+  state.settingFormData.connectionSate.ipAddress;
