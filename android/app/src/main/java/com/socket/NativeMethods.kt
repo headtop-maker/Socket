@@ -4,7 +4,6 @@ import android.widget.Toast
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.modules.core.DeviceEventManagerModule
 
 import android.app.Activity
 import android.content.Intent
@@ -38,7 +37,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
     private val DURATION_SHORT_KEY = "SHORT"
     private val DURATION_LONG_KEY = "LONG"
     val PICK_PDF_FILE = 2
-    var fileType = ""
+    var fileParams = ""
     var mEmitter: RCTDeviceEventEmitter? = null
 
     override fun getName(): String {
@@ -104,10 +103,10 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                     val cursor = uri.let { it1 -> reactApplicationContext.contentResolver.query(it1, null, null, null, null) }
                     cursor?.moveToFirst()
                     println(cursor?.getString(2))
-                    Log.d("URINative", cursor?.getString(2).toString())
-                    val getFileType = cursor?.getString(2)?.split(".")!![1]
+                    val fileParams = "${cursor?.getString(2)?.split(".")!![0]}:${cursor?.getString(2)?.split(".")!![1]}:${cursor?.getString(5)}"
+                    Log.d("URINative", fileParams)
                     thread {
-                        clientType(getFileType, uri)
+                        clientType(fileParams, uri)
                     }
                 }
 
@@ -159,11 +158,10 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                 val client = server.accept()
                 println("client -> " + (count++))
                 var inStream = client.getInputStream()
-                println("fileType -> " + fileType)
+                println("fileType -> " + fileParams)
                 var outFileStream =
-                    FileOutputStream("/storage/emulated/0/Download/UploadFile${UUID.randomUUID()}.${fileType}")
+                    FileOutputStream("/storage/emulated/0/Download/${fileParams.split(":")[0]}${UUID.randomUUID()}.${fileParams.split(":")[1]}")
                 var countBytes: Int
-//                sendEvent("count","start")
                 var i = 0;
                 runOnUiThread(Runnable {
                     sendEvent("count","start")
@@ -172,13 +170,11 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                     countBytes = inStream.read()
                     if (countBytes != -1) {
                         outFileStream.write(countBytes)
-//                        i++
-
                     } else {
-                        println("server receive file")
                         Log.d("URINative","server receive file")
                         runOnUiThread(Runnable {
                             sendEvent("count","stop")
+                            Toast.makeText(reactApplicationContext,"server receive file",Toast.LENGTH_LONG).show()
                         })
                         writeLoop = false
                         outFileStream.close()
@@ -202,13 +198,12 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                 var bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
                 var request = bufferReader.readLine()
                 println("on server request ->  " + request)
-                fileType = request;
-                println("on server fileType -> " + fileType)
-                Log.d("URINative fileType", fileType)
-                if (fileType !== "") {
+                fileParams = request;
+                println("on server fileType -> " + fileParams)
+                Log.d("URINative fileType", fileParams)
+                if (fileParams !== "") {
                     bufferedWriter.write("ok")
                 }
-
                 bufferedWriter.newLine()
                 bufferedWriter.flush()
                 bufferReader.close()
@@ -217,16 +212,16 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
             }
         }
     }
-    fun clientFile(uri: Uri) {
+    fun clientFile(uri: Uri,size:Int) {
         Executors.newSingleThreadExecutor().execute {
             var sendLoop = true
-            var client = Socket("192.168.0.103", 9999)
+            var client = Socket("192.168.1.150", 9999)
 
 //            var file = FileInputStream("/storage/emulated/0/Download/uv2021psn.pdf")
             var file = uri.let { it1 -> reactApplicationContext.contentResolver.openInputStream(it1) }
 
             val out = client.getOutputStream()
-            val bytes = ByteArray(5242880)
+            val bytes = ByteArray(size)
             var countBytes: Int
             do {
                 if (file != null) {
@@ -235,7 +230,6 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                         out.write(bytes, 0, countBytes)
                     } else {
                         println("client send file")
-
                         sendLoop = false
                         file.close()
                         out.close()
@@ -245,19 +239,19 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
             client.close()
         }
     }
-    fun clientType(fileType: String, uri: Uri) {
+    fun clientType(fileParams: String, uri: Uri) {
         Executors.newSingleThreadExecutor().execute {
-            val client = Socket("192.168.0.103", 9998)
+            val client = Socket("192.168.1.150", 9998)
             val bufferedWriter = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
             val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
-            bufferedWriter.write(fileType) // перенос строки очень важен
+            bufferedWriter.write(fileParams) // перенос строки очень важен
             bufferedWriter.newLine()
             bufferedWriter.flush()
             println("on client -> " + bufferReader.readLine())
 
             if (bufferReader.readLine() !== "") {
-                println(fileType)
-                clientFile(uri)
+                println(fileParams)
+                clientFile(uri,fileParams.split(":")[2].toInt())
             }
             bufferReader.close()
             bufferedWriter.close()
