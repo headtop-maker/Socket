@@ -141,7 +141,6 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                 writer.write("</ul>")
                 writer.write("socket client number " + count)
                 writer.flush()
-
                 writer.close()
                 client.close()
             }
@@ -164,7 +163,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                 var countBytes: Int
                 var i = 0;
                 runOnUiThread(Runnable {
-                    sendEvent("count","start")
+                    sendEvent("count","start byte size:${fileParams.split(":")[2]} ")
                 })
                 do {
                     countBytes = inStream.read()
