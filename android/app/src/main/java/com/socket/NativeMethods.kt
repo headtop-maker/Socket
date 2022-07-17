@@ -26,12 +26,11 @@ import com.facebook.react.bridge.UiThreadUtil.runOnUiThread
 import com.facebook.react.bridge.WritableMap
 import com.th3rdwave.safeareacontext.getReactContext
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import java.net.SocketException
 
 
-
-
-
-class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaModule(reactContext){
+class NativeMethods(reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(reactContext) {
     var activity: Activity? = null
 
     private val DURATION_SHORT_KEY = "SHORT"
@@ -39,43 +38,45 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
     val PICK_PDF_FILE = 2
     var fileParams = ""
     var mEmitter: RCTDeviceEventEmitter? = null
+    var serverAddress = ""
+
+
 
     override fun getName(): String {
         return "NativeMethods"
     }
 
     override fun getConstants(): kotlin.collections.Map<String, Any> {
-        val constants = HashMap<String,Any>()
+        val constants = HashMap<String, Any>()
         constants.put(DURATION_SHORT_KEY, Toast.LENGTH_SHORT)
-        constants.put(DURATION_LONG_KEY,Toast.LENGTH_LONG)
+        constants.put(DURATION_LONG_KEY, Toast.LENGTH_LONG)
         return constants
     }
 
 
-
-    fun sendEvent(eventName:String,message:String){
+    fun sendEvent(eventName: String, message: String) {
         val params = Arguments.createMap()
-        params.putString("message",message)
-        if(mEmitter == null){
-            mEmitter= reactApplicationContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        params.putString("message", message)
+        if (mEmitter == null) {
+            mEmitter = reactApplicationContext.getJSModule(RCTDeviceEventEmitter::class.java)
         }
-        mEmitter?.emit(eventName,params)
+        mEmitter?.emit(eventName, params)
     }
 
     @ReactMethod
-    fun show(message:String,duration: Int){
-        Toast.makeText(reactApplicationContext,message,duration).show()
+    fun show(message: String, duration: Int) {
+        Toast.makeText(reactApplicationContext, message, duration).show()
     }
 
     @ReactMethod
-    fun startMinWebServer(){
-        Toast.makeText(reactApplicationContext,"Start web server",Toast.LENGTH_LONG).show()
+    fun startMinWebServer() {
+        Toast.makeText(reactApplicationContext, "Start web server", Toast.LENGTH_LONG).show()
         serverWeb()
     }
 
     @ReactMethod
-    fun startFileTypeServers(){
-        Toast.makeText(reactApplicationContext,"Start file,type servers",Toast.LENGTH_LONG).show()
+    fun startFileTypeServers() {
+        Toast.makeText(reactApplicationContext, "Start file,type servers", Toast.LENGTH_LONG).show()
         serverFile();serverType()
     }
 
@@ -99,11 +100,21 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
             ) {
                 super.onActivityResult(requestCode, resultCode, intent)
                 intent?.data?.also { uri ->
-                    Log.d("URINative",uri.toString())
-                    val cursor = uri.let { it1 -> reactApplicationContext.contentResolver.query(it1, null, null, null, null) }
+                    Log.d("URINative", uri.toString())
+                    val cursor = uri.let { it1 ->
+                        reactApplicationContext.contentResolver.query(
+                            it1,
+                            null,
+                            null,
+                            null,
+                            null
+                        )
+                    }
                     cursor?.moveToFirst()
                     println(cursor?.getString(2))
-                    val fileParams = "${cursor?.getString(2)?.split(".")!![0]}:${cursor?.getString(2)?.split(".")!![1]}:${cursor?.getString(5)}"
+                    val fileParams = "${cursor?.getString(2)?.split(".")!![0]}:${
+                        cursor?.getString(2)?.split(".")!![1]
+                    }:${cursor?.getString(5)}"
                     Log.d("URINative", fileParams)
                     thread {
                         clientType(fileParams, uri)
@@ -122,6 +133,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
         val files = directory.listFiles()
         return files
     }
+
     fun serverWeb() {
         var count: Int = 0
         val server = ServerSocket(9997)
@@ -137,7 +149,7 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
                             "<H1>Загрузки</H1>" // для сайта
                 )
                 writer.write("<ul>")
-                listFile()?.forEach { writer.write("<li>"+it.toString()+"</li>")  }
+                listFile()?.forEach { writer.write("<li>" + it.toString() + "</li>") }
                 writer.write("</ul>")
                 writer.write("socket client number " + count)
                 writer.flush()
@@ -149,112 +161,161 @@ class NativeMethods(reactContext:ReactApplicationContext):ReactContextBaseJavaMo
 
     fun serverFile() {
         var count: Int = 0
-        val server = ServerSocket(9999)
-        thread {
-            println("Server running on port ${server.localPort}")
-            while (true) {
-                var writeLoop = true
-                val client = server.accept()
-                println("client -> " + (count++))
-                var inStream = client.getInputStream()
-                println("fileType -> " + fileParams)
-                var outFileStream =
-                    FileOutputStream("/storage/emulated/0/Download/${fileParams.split(":")[0]}${UUID.randomUUID()}.${fileParams.split(":")[1]}")
-                var countBytes: Int
-                var i = 0;
-                runOnUiThread(Runnable {
-                    sendEvent("count","start byte size:${fileParams.split(":")[2]} ")
-                })
-                do {
-                    countBytes = inStream.read()
-                    if (countBytes != -1) {
-                        outFileStream.write(countBytes)
-                    } else {
-                        Log.d("URINative","server receive file")
-                        runOnUiThread(Runnable {
-                            sendEvent("count","stop")
-                            Toast.makeText(reactApplicationContext,"server receive file",Toast.LENGTH_LONG).show()
-                        })
-                        writeLoop = false
-                        outFileStream.close()
-                    }
-                } while (writeLoop)
-                inStream.close()
-                client.close()
+        val server: ServerSocket
+        try {
+            server = ServerSocket(9999)
+            thread {
+                println("Server running on port ${server.localPort}")
+                while (true) {
+                    var writeLoop = true
+                    val client = server.accept()
+                    val inStream = client.getInputStream()
+                    val outFileStream =
+                        FileOutputStream(
+                            "/storage/emulated/0/Download/${fileParams.split(":")[0]}${UUID.randomUUID()}.${
+                                fileParams.split(
+                                    ":"
+                                )[1]
+                            }"
+                        )
+                    var countBytes: Int
+                    var i = 0;
+                    runOnUiThread(Runnable {
+                        sendEvent("count", "start byte size:${fileParams.split(":")[2]} ")
+                    })
+                    do {
+                        countBytes = inStream.read()
+                        if (countBytes != -1) {
+                            outFileStream.write(countBytes)
+                        } else {
+                            Log.d("URINative", "server receive file")
+                            runOnUiThread(Runnable {
+                                sendEvent("count", "stop")
+                                Toast.makeText(
+                                    reactApplicationContext,
+                                    "server receive file",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            })
+                            writeLoop = false
+                            outFileStream.close()
+                        }
+                    } while (writeLoop)
+                    inStream.close()
+                    client.close()
+                }
             }
+        } catch (se: SocketException) {
+            runOnUiThread(Runnable {
+                Toast.makeText(
+                    reactApplicationContext,
+                    "Server FILE ERROR" + se.message.toString(),
+                    Toast.LENGTH_LONG
+                ).show()
+            })
+        }
+    }
+
+    fun serverType() {
+        try {
+            val server = ServerSocket(9998)
+            thread {
+                println("Server running on port ${server.localPort}")
+                while (true) {
+                    val client = server.accept()
+                    val bufferedWriter =
+                        BufferedWriter(OutputStreamWriter(client.getOutputStream()))
+                    val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
+                    val request = bufferReader.readLine()
+                    fileParams = request;
+                    Log.d("URINative fileType", fileParams)
+                    if (fileParams !== "") {
+                        bufferedWriter.write("ok")
+                    }
+                    bufferedWriter.newLine()
+                    bufferedWriter.flush()
+                    bufferReader.close()
+                    bufferedWriter.close()
+                    client.close()
+                }
+            }
+        } catch (se: SocketException) {
+            runOnUiThread(Runnable {
+                Toast.makeText(
+                    reactApplicationContext,
+                    "Server TYPE ERROR " + se.message.toString(),
+                    Toast.LENGTH_LONG
+                ).show()
+            })
         }
 
     }
-    fun serverType() {
-        var count = 0
-        val server = ServerSocket(9998)
-        thread {
-            println("Server running on port ${server.localPort}")
-            while (true) {
-                val client = server.accept()
-                println("client -> " + (count++))
-                var bufferedWriter = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
-                var bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
-                var request = bufferReader.readLine()
-                println("on server request ->  " + request)
-                fileParams = request;
-                println("on server fileType -> " + fileParams)
-                Log.d("URINative fileType", fileParams)
-                if (fileParams !== "") {
-                    bufferedWriter.write("ok")
-                }
+
+    fun clientFile(uri: Uri, size: Int) {
+        Executors.newSingleThreadExecutor().execute {
+            try {
+                var sendLoop = true
+                var client = Socket("192.168.1.150", 9999)
+//            var file = FileInputStream("/storage/emulated/0/Download/uv2021psn.pdf")
+                var file =
+                    uri.let { it1 -> reactApplicationContext.contentResolver.openInputStream(it1) }
+                val out = client.getOutputStream()
+                val bytes = ByteArray(size)
+                var countBytes: Int
+                do {
+                    if (file != null) {
+                        countBytes = file.read(bytes)
+                        if (countBytes > 0) {
+                            out.write(bytes, 0, countBytes)
+                        } else {
+                            println("client send file")
+                            sendLoop = false
+                            file.close()
+                            out.close()
+                        }
+                    }
+                } while (sendLoop)
+                client.close()
+            } catch (se: SocketException) {
+                runOnUiThread(Runnable {
+                    Toast.makeText(
+                        reactApplicationContext,
+                        "Send file ERROR " + se.message.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                })
+            }
+
+        }
+    }
+
+    fun clientType(fileParams: String, uri: Uri) {
+        Executors.newSingleThreadExecutor().execute {
+            try {
+                val client = Socket("192.168.1.150", 9998)
+                val bufferedWriter = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
+                val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
+                bufferedWriter.write(fileParams) // перенос строки очень важен
                 bufferedWriter.newLine()
                 bufferedWriter.flush()
+                println("on client -> " + bufferReader.readLine())
+
+                if (bufferReader.readLine() !== "") {
+                    println(fileParams)
+                    clientFile(uri, fileParams.split(":")[2].toInt())
+                }
                 bufferReader.close()
                 bufferedWriter.close()
                 client.close()
+            } catch (se: SocketException) {
+                runOnUiThread(Runnable {
+                    Toast.makeText(
+                        reactApplicationContext,
+                        "Send type ERROR " + se.message.toString(),
+                        Toast.LENGTH_LONG
+                    ).show()
+                })
             }
-        }
-    }
-    fun clientFile(uri: Uri,size:Int) {
-        Executors.newSingleThreadExecutor().execute {
-            var sendLoop = true
-            var client = Socket("192.168.1.150", 9999)
-
-//            var file = FileInputStream("/storage/emulated/0/Download/uv2021psn.pdf")
-            var file = uri.let { it1 -> reactApplicationContext.contentResolver.openInputStream(it1) }
-
-            val out = client.getOutputStream()
-            val bytes = ByteArray(size)
-            var countBytes: Int
-            do {
-                if (file != null) {
-                    countBytes = file.read(bytes)
-                    if (countBytes > 0) {
-                        out.write(bytes, 0, countBytes)
-                    } else {
-                        println("client send file")
-                        sendLoop = false
-                        file.close()
-                        out.close()
-                    }
-                }
-            } while (sendLoop)
-            client.close()
-        }
-    }
-    fun clientType(fileParams: String, uri: Uri) {
-        Executors.newSingleThreadExecutor().execute {
-            val client = Socket("192.168.1.150", 9998)
-            val bufferedWriter = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
-            val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
-            bufferedWriter.write(fileParams) // перенос строки очень важен
-            bufferedWriter.newLine()
-            bufferedWriter.flush()
-            println("on client -> " + bufferReader.readLine())
-
-            if (bufferReader.readLine() !== "") {
-                println(fileParams)
-                clientFile(uri,fileParams.split(":")[2].toInt())
-            }
-            bufferReader.close()
-            bufferedWriter.close()
-            client.close()
         }
     }
 
