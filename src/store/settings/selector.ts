@@ -19,3 +19,6 @@ export const getConnectionConnected = (state: TState) =>
 
 export const getIpAddress = (state: TState) =>
   state.settingFormData.connectionSate.ipAddress;
+
+export const getCurrentFileParams = (state: TState) =>
+  state.settingFormData.currentFileParams;

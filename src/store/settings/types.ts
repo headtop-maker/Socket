@@ -10,10 +10,18 @@ export interface IConnectionState {
   type: string;
 }
 
+export interface ICurrentFileParams {
+  fileName: string;
+  fileType: string;
+  fileByteSize: number;
+  fileUri: string;
+}
+
 export interface ISettings {
   settingsForm: ISettingsForm;
   remotedeviceID: string;
   deviceID: string;
   showInputModal: boolean;
   connectionSate: IConnectionState;
+  currentFileParams: ICurrentFileParams;
 }

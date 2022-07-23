@@ -1,37 +1,48 @@
 package com.socket;
 
 import android.widget.Toast
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
+import android.os.Message
 import android.provider.DocumentsContract
 import android.util.Log
 import android.widget.TextView
 import java.net.ServerSocket
 import kotlin.concurrent.thread
 import com.facebook.react.ReactInstanceManager
-import com.facebook.react.bridge.BaseActivityEventListener
+import com.facebook.react.bridge.*
 import java.io.*
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
-import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.UiThreadUtil.runOnUiThread
 
-import com.facebook.react.bridge.WritableMap
 import com.th3rdwave.safeareacontext.getReactContext
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import java.net.SocketException
+
+import java.io.ObjectOutputStream
+import android.system.Os.socket
+
+import java.io.OutputStream
+import java.util.ArrayList
+
+import java.io.ObjectInputStream
+import android.system.Os.socket
+
+import java.io.InputStream
+
+
+
 
 
 class NativeMethods(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
     var activity: Activity? = null
+    var promise: Promise? = null
 
     private val DURATION_SHORT_KEY = "SHORT"
     private val DURATION_LONG_KEY = "LONG"
@@ -81,7 +92,16 @@ class NativeMethods(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun openFile() {
+    fun sendFile(serverAddress:String ,  fileName: String, fileType: String, fileByteSize: Int, fileUri: String) {
+        this.serverAddress = serverAddress
+        var currentUri = Uri.parse(fileUri)
+        Log.d("sendParams", "$serverAddress$fileName$fileType$fileByteSize$fileUri  :  $currentUri")
+        clientType("$fileName:$fileType:$fileByteSize",currentUri)
+    }
+
+    @ReactMethod
+    fun openFile(promise: Promise) {
+        this.promise = promise;
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"
@@ -98,6 +118,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                 resultCode: Int,
                 intent: Intent?
             ) {
+                val fileParams: WritableMap = WritableNativeMap()
                 super.onActivityResult(requestCode, resultCode, intent)
                 intent?.data?.also { uri ->
                     Log.d("URINative", uri.toString())
@@ -112,13 +133,12 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                     }
                     cursor?.moveToFirst()
                     println(cursor?.getString(2))
-                    val fileParams = "${cursor?.getString(2)?.split(".")!![0]}:${
-                        cursor?.getString(2)?.split(".")!![1]
-                    }:${cursor?.getString(5)}"
-                    Log.d("URINative", fileParams)
-                    thread {
-                        clientType(fileParams, uri)
-                    }
+                    fileParams.putString("fileName",cursor?.getString(2)?.split(".")!![0])
+                    fileParams.putString("fileType", cursor.getString(2)?.split(".")!![1])
+                    fileParams.putInt("fileByteSize", cursor.getString(5).toInt())
+                    fileParams.putString("fileUri", uri.toString())
+                    promise?.resolve(fileParams)
+
                 }
 
             }
@@ -226,6 +246,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                     val bufferedWriter =
                         BufferedWriter(OutputStreamWriter(client.getOutputStream()))
                     val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
+
                     val request = bufferReader.readLine()
                     fileParams = request;
                     Log.d("URINative fileType", fileParams)
@@ -255,7 +276,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
         Executors.newSingleThreadExecutor().execute {
             try {
                 var sendLoop = true
-                var client = Socket("192.168.1.150", 9999)
+                var client = Socket(serverAddress, 9999)
 //            var file = FileInputStream("/storage/emulated/0/Download/uv2021psn.pdf")
                 var file =
                     uri.let { it1 -> reactApplicationContext.contentResolver.openInputStream(it1) }
@@ -285,21 +306,19 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                     ).show()
                 })
             }
-
         }
     }
 
     fun clientType(fileParams: String, uri: Uri) {
         Executors.newSingleThreadExecutor().execute {
             try {
-                val client = Socket("192.168.1.150", 9998)
+                val client = Socket(serverAddress, 9998)
                 val bufferedWriter = BufferedWriter(OutputStreamWriter(client.getOutputStream()))
                 val bufferReader = BufferedReader(InputStreamReader(client.getInputStream()))
                 bufferedWriter.write(fileParams) // перенос строки очень важен
                 bufferedWriter.newLine()
                 bufferedWriter.flush()
                 println("on client -> " + bufferReader.readLine())
-
                 if (bufferReader.readLine() !== "") {
                     println(fileParams)
                     clientFile(uri, fileParams.split(":")[2].toInt())

@@ -16,6 +16,12 @@ const initialState: ISettings = {
     isWifiEnabled: false,
     type: '',
   },
+  currentFileParams: {
+    fileByteSize: 0,
+    fileName: '',
+    fileType: '',
+    fileUri: '',
+  },
 };
 
 const settingsFormReducer = (state = initialState, action: AnyAction) => {
@@ -24,6 +30,16 @@ const settingsFormReducer = (state = initialState, action: AnyAction) => {
       return {
         ...state,
         connectionSate: action.payload,
+      };
+    case ActionType.setCurrentFileParams:
+      return {
+        ...state,
+        currentFileParams: action.payload,
+      };
+    case ActionType.clearCurrentFileParams:
+      return {
+        ...state,
+        currentFileParams: initialState.currentFileParams,
       };
     case ActionType.setAccuracy:
       return {
