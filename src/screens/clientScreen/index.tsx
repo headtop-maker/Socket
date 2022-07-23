@@ -51,6 +51,12 @@ const ClientScreen = () => {
   return (
     <View>
       <Text>ClientScreen</Text>
+      <View style={{borderWidth: 1, alignSelf: 'center'}}>
+        <Text>
+          {fileName}.{fileType}
+        </Text>
+        <Text>{fileByteSize} bytes</Text>
+      </View>
       <TextInput
         value={ipAddress}
         onChangeText={setIpAddress}
