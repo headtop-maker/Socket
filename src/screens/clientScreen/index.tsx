@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, NativeModules, TextInput, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
+import FileIcon from '../../components/FileIcon';
 import {
   clearCurrentFileParamsState,
   setCurrentFileParamsState,
@@ -49,30 +50,38 @@ const ClientScreen = () => {
   console.log('currentFile', currentFile);
 
   return (
-    <View>
-      <Text>ClientScreen</Text>
-      <View style={{borderWidth: 1, alignSelf: 'center'}}>
-        <Text>
-          {fileName}.{fileType}
-        </Text>
-        <Text>{fileByteSize} bytes</Text>
+    <View style={{flex: 1}}>
+      <View
+        style={{flex: 0.5, borderBottomColor: 'black', borderBottomWidth: 1}}>
+        <TextInput
+          value={ipAddress}
+          onChangeText={setIpAddress}
+          keyboardType="number-pad"
+          style={styles.textInput}
+        />
       </View>
-      <TextInput
-        value={ipAddress}
-        onChangeText={setIpAddress}
-        keyboardType="number-pad"
-        style={styles.textInput}
-      />
-      <CustomButton
-        onPress={openFile}
-        title="Выбрать файл"
-        disabled={!isConnect && !!ipAddress}
-      />
-      <CustomButton
-        onPress={sendFile}
-        title="Отправить файл"
-        disabled={!currentFile}
-      />
+      <View
+        style={{
+          flex: 0.5,
+          flexDirection: 'column',
+          justifyContent: 'space-evenly',
+        }}>
+        <FileIcon
+          fileByteSize={fileByteSize}
+          fileName={fileName}
+          fileType={fileType}
+        />
+        <CustomButton
+          onPress={openFile}
+          title="Выбрать файл"
+          disabled={!isConnect && !!ipAddress}
+        />
+        <CustomButton
+          onPress={sendFile}
+          title="Отправить файл"
+          disabled={!currentFile}
+        />
+      </View>
     </View>
   );
 };
