@@ -1,12 +1,13 @@
-import React, {useState} from 'react';
-import {View, Text, NativeModules, TextInput, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, NativeModules, TextInput, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
-import {
-  clearCurrentFileParamsState,
-  setCurrentFileParamsState,
-} from '../../store/settings/action';
+import withModal from '../../HOC/withModal';
+
+import useDimensions from '../../hooks/useDimensions';
+
+import {setCurrentFileParamsState} from '../../store/settings/action';
 import {
   getConnectionConnected,
   getCurrentFileParams,
@@ -21,9 +22,10 @@ type FileParamsType = {
   fileUri: string;
 };
 
-const ClientScreen = () => {
+const ClientScreen = ({value}) => {
   const isConnect = useSelector(getConnectionConnected);
   const [ipAddress, setIpAddress] = useState('192.168.1.150');
+  const [screenWidth, screenHeigth, isLandScape] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const {fileName, fileType, fileByteSize, fileUri} = currentFile;
   const dispatch = useDispatch();
@@ -48,11 +50,22 @@ const ClientScreen = () => {
   };
 
   console.log('currentFile', currentFile);
+  console.log('isLandScape', isLandScape);
 
   return (
-    <View style={{flex: 1}}>
+    <View
+      style={{
+        flex: 1,
+        zIndex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+      }}>
       <View
-        style={{flex: 0.5, borderBottomColor: 'black', borderBottomWidth: 1}}>
+        style={{
+          flex: 0.5,
+          borderBottomColor: 'black',
+          borderBottomWidth: 1,
+        }}>
         <TextInput
           value={ipAddress}
           onChangeText={setIpAddress}
@@ -95,4 +108,4 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-export default ClientScreen;
+export default withModal(ClientScreen);

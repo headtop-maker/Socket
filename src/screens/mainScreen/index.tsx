@@ -7,7 +7,7 @@ import ClientScreen from '../clientScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
-export default function MainScreen() {
+const MainScreen = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -22,4 +22,5 @@ export default function MainScreen() {
       />
     </Tab.Navigator>
   );
-}
+};
+export default MainScreen;
