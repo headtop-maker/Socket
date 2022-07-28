@@ -22,12 +22,11 @@ type FileParamsType = {
   fileUri: string;
 };
 
-const ClientScreen = ({value}) => {
+const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
   const [ipAddress, setIpAddress] = useState('192.168.1.150');
   const [screenWidth, screenHeigth, isLandScape] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
-  const {fileName, fileType, fileByteSize, fileUri} = currentFile;
   const dispatch = useDispatch();
 
   const openFile = async () => {
@@ -40,13 +39,15 @@ const ClientScreen = ({value}) => {
   };
 
   const sendFile = () => {
-    NativeMethods.sendFile(
-      ipAddress,
-      fileName,
-      fileType,
-      fileByteSize,
-      fileUri,
-    );
+    if (currentFile && currentFile.fileName !== undefined) {
+      NativeMethods.sendFile(
+        ipAddress,
+        currentFile.fileName,
+        currentFile.fileType,
+        currentFile.fileByteSize,
+        currentFile.fileUri,
+      );
+    }
   };
 
   console.log('currentFile', currentFile);
@@ -79,11 +80,14 @@ const ClientScreen = ({value}) => {
           flexDirection: 'column',
           justifyContent: 'space-evenly',
         }}>
-        <FileIcon
-          fileByteSize={fileByteSize}
-          fileName={fileName}
-          fileType={fileType}
-        />
+        {currentFile !== undefined ? (
+          <FileIcon
+            fileByteSize={currentFile.fileByteSize}
+            fileName={currentFile.fileName}
+            fileType={currentFile.fileType}
+          />
+        ) : null}
+
         <CustomButton
           onPress={openFile}
           title="Выбрать файл"
@@ -92,7 +96,7 @@ const ClientScreen = ({value}) => {
         <CustomButton
           onPress={sendFile}
           title="Отправить файл"
-          disabled={!currentFile}
+          disabled={currentFile === undefined}
         />
       </View>
     </View>

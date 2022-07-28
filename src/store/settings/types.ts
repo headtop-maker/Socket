@@ -2,6 +2,11 @@ export interface ISettingsForm {
   accuracy: number;
 }
 
+export interface IModalState {
+  showModal: boolean;
+  message: string;
+}
+
 export interface IConnectionState {
   ipAddress: string;
   isConnected: boolean;
@@ -24,4 +29,5 @@ export interface ISettings {
   showInputModal: boolean;
   connectionSate: IConnectionState;
   currentFileParams: ICurrentFileParams;
+  modalState: IModalState;
 }

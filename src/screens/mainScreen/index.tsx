@@ -2,7 +2,7 @@ import React from 'react';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import SCREENS from '../../constants/screen';
-import ServerScreen from '../serverScreen/ServerScreen';
+import ServerScreen from '../serverScreen';
 import ClientScreen from '../clientScreen';
 
 const Tab = createMaterialTopTabNavigator();

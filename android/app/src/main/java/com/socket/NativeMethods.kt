@@ -154,6 +154,12 @@ class NativeMethods(reactContext: ReactApplicationContext) :
         return files
     }
 
+    fun sendOnUI(eventName: String,message: String){
+        runOnUiThread(Runnable {
+            sendEvent(eventName, message)
+        })
+    }
+
     fun serverWeb() {
         var count: Int = 0
         val server = ServerSocket(9997)
@@ -200,17 +206,15 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                         )
                     var countBytes: Int
                     var i = 0;
-                    runOnUiThread(Runnable {
-                        sendEvent("count", "start byte size:${fileParams.split(":")[2]} ")
-                    })
+                    sendOnUI("status", "loading")
                     do {
                         countBytes = inStream.read()
                         if (countBytes != -1) {
                             outFileStream.write(countBytes)
                         } else {
                             Log.d("URINative", "server receive file")
+                            sendOnUI("status", "receive")
                             runOnUiThread(Runnable {
-                                sendEvent("count", "stop")
                                 Toast.makeText(
                                     reactApplicationContext,
                                     "server receive file",
@@ -226,6 +230,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                 }
             }
         } catch (se: SocketException) {
+            sendOnUI("status", "failure")
             runOnUiThread(Runnable {
                 Toast.makeText(
                     reactApplicationContext,

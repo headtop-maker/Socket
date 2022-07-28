@@ -1,4 +1,4 @@
-import {IConnectionState, ICurrentFileParams} from './types';
+import {IConnectionState, ICurrentFileParams, IModalState} from './types';
 
 export enum ActionType {
   setAccuracy = 'SET_ACCURACY',
@@ -8,11 +8,19 @@ export enum ActionType {
   setConnectionSate = 'SET_CONNECTION_STATE',
   setCurrentFileParams = 'SET_CURRENT_FILE_PARAMS',
   clearCurrentFileParams = 'CLEAR_CURRENT_FILE_PARAMS',
+  setModalState = 'SET_MODAL_STATE',
 }
 
 export const setConnectionState = (data: IConnectionState) => {
   return {
     type: ActionType.setConnectionSate,
+    payload: data,
+  };
+};
+
+export const setModalState = (data: IModalState) => {
+  return {
+    type: ActionType.setModalState,
     payload: data,
   };
 };

@@ -22,3 +22,5 @@ export const getIpAddress = (state: TState) =>
 
 export const getCurrentFileParams = (state: TState) =>
   state.settingFormData.currentFileParams;
+
+export const getModalSate = (state: TState) => state.settingFormData.modalState;

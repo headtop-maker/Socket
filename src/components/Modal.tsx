@@ -1,25 +1,39 @@
 import React, {useState} from 'react';
 import {Alert, Modal, StyleSheet, Text, Pressable, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import useDimensions from '../hooks/useDimensions';
+import {setModalState} from '../store/settings/action';
+import {getModalSate} from '../store/settings/selector';
 
 const ModalScreen = () => {
-  const [modalVisible, setModalVisible] = useState(true);
+  const modalState = useSelector(getModalSate);
+  const dispatch = useDispatch();
+  const [screenWidth]: any = useDimensions();
+
+  console.log('modalState', modalState);
+  console.log('screenWidth', typeof screenWidth);
 
   return (
-    <View style={styles.centeredView}>
+    <View
+      style={[
+        styles.centeredView,
+        {marginTop: screenWidth ? screenWidth / 2 : 1},
+      ]}>
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
-        visible={modalVisible}
+        visible={modalState.showModal}
         onRequestClose={() => {
           Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
+            <Text style={styles.modalText}>{modalState.message}</Text>
             <Pressable
               style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}>
+              onPress={() =>
+                dispatch(setModalState({message: '', showModal: false}))
+              }>
               <Text style={styles.textStyle}>Hide Modal</Text>
             </Pressable>
           </View>
@@ -34,7 +48,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    // marginTop: 22,
   },
   modalView: {
     // margin: 20,

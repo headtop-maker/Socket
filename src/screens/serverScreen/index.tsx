@@ -2,27 +2,16 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, NativeModules, DeviceEventEmitter} from 'react-native';
 import {useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
-import SettingsButton from '../../components/settingsButton';
+
+import withModal from '../../HOC/withModal';
 import {getConnectionConnected} from '../../store/settings/selector';
 
 const {NativeMethods} = NativeModules;
 
-export default function ServerScreen() {
-  const [count, setCount] = useState();
-
+const ServerScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
-
-  useEffect(() => {
-    DeviceEventEmitter.addListener('count', data => {
-      setCount(data.message);
-    });
-  }, []);
-
   return (
     <View>
-      <Text>
-        ServerScreen {`${count}`} {`${isConnect}`}
-      </Text>
       <CustomButton
         onPress={() => NativeMethods.startFileTypeServers()}
         title="Включить сервер"
@@ -35,4 +24,5 @@ export default function ServerScreen() {
       />
     </View>
   );
-}
+};
+export default withModal(ServerScreen);

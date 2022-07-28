@@ -22,6 +22,10 @@ const initialState: ISettings = {
     fileType: '',
     fileUri: '',
   },
+  modalState: {
+    message: '',
+    showModal: false,
+  },
 };
 
 const settingsFormReducer = (state = initialState, action: AnyAction) => {
@@ -30,6 +34,11 @@ const settingsFormReducer = (state = initialState, action: AnyAction) => {
       return {
         ...state,
         connectionSate: action.payload,
+      };
+    case ActionType.setModalState:
+      return {
+        ...state,
+        modalState: action.payload,
       };
     case ActionType.setCurrentFileParams:
       return {
