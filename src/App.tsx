@@ -3,9 +3,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import rootReducer from './store/rootReducer';
-import {View, Text} from 'react-native';
 import Main from './containers/main';
-import NetInfoHelper from './helpers/NetInfoHelper';
 
 const {store, persistor} = rootReducer();
 const App = () => {

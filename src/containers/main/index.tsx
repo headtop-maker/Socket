@@ -3,7 +3,7 @@ import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainScreen from '../../screens/mainScreen';
 import SCREENS from '../../constants/screen';
-import {View, Text, DeviceEventEmitter} from 'react-native';
+import {View, Text} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -13,6 +13,10 @@ import {
 } from '../../store/settings/action';
 import {getConnectionType, getIpAddress} from '../../store/settings/selector';
 import NetInfoHelper from '../../helpers/NetInfoHelper';
+import withModal from '../../HOC/withModal';
+import useEventEmitter from '../../hooks/useEventEmitter';
+import {EventsMessages} from './eventsMessages';
+import {EventsNames} from './eventsNames';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,20 +46,82 @@ const Main = () => {
     };
   }, []);
 
-  useEffect(() => {
-    DeviceEventEmitter.addListener('status', data => {
-      if (data.message === 'loading') {
-        dispatch(setModalState({message: 'Загружаю', showModal: true}));
-      }
-      if (data.message === 'receive') {
-        dispatch(setModalState({message: '', showModal: false}));
+  const statusActions = [
+    {
+      eventMessageName: EventsMessages.loading,
+      eventFunction: () =>
+        dispatch(
+          setModalState({
+            message: 'Загружаю',
+            showModal: true,
+            showIndicator: true,
+          }),
+        ),
+    },
+    {
+      eventMessageName: EventsMessages.receive,
+      eventFunction: () =>
+        dispatch(
+          setModalState({
+            message: 'Файл загружен ',
+            showModal: true,
+            showIndicator: false,
+          }),
+        ),
+    },
+    {
+      eventMessageName: EventsMessages.failure,
+      eventFunction: () =>
+        dispatch(
+          setModalState({
+            message: 'Ошибка сервера',
+            showModal: true,
+            showIndicator: false,
+          }),
+        ),
+    },
+  ];
+
+  const clientActions = [
+    {
+      eventMessageName: EventsMessages.sending,
+      eventFunction: () =>
+        dispatch(
+          setModalState({
+            message: 'Отправляю',
+            showModal: true,
+            showIndicator: true,
+          }),
+        ),
+    },
+    {
+      eventMessageName: EventsMessages.sent,
+      eventFunction: () => {
+        dispatch(
+          setModalState({
+            message: 'Файл отправлен ',
+            showModal: true,
+            showIndicator: false,
+          }),
+        );
         dispatch(clearCurrentFileParamsState());
-      }
-      if (data.message === 'failure') {
-        dispatch(setModalState({message: 'Ошибка', showModal: true}));
-      }
-    });
-  }, []);
+      },
+    },
+    {
+      eventMessageName: EventsMessages.failure,
+      eventFunction: () =>
+        dispatch(
+          setModalState({
+            message: 'Ошибка клиента',
+            showModal: true,
+            showIndicator: false,
+          }),
+        ),
+    },
+  ];
+
+  useEventEmitter(EventsNames.status, statusActions);
+  useEventEmitter(EventsNames.client, clientActions);
 
   const HRight = () => {
     return (
@@ -86,4 +152,4 @@ const Main = () => {
     </NavigationContainer>
   );
 };
-export default Main;
+export default withModal(Main);

@@ -25,7 +25,7 @@ type FileParamsType = {
 const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
   const [ipAddress, setIpAddress] = useState('192.168.1.150');
-  const [screenWidth, screenHeigth, isLandScape] = useDimensions();
+  const [isLandScape] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const dispatch = useDispatch();
 

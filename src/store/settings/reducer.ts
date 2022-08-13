@@ -25,6 +25,7 @@ const initialState: ISettings = {
   modalState: {
     message: '',
     showModal: false,
+    showIndicator: false,
   },
 };
 

@@ -5,6 +5,7 @@ export interface ISettingsForm {
 export interface IModalState {
   showModal: boolean;
   message: string;
+  showIndicator: boolean;
 }
 
 export interface IConnectionState {

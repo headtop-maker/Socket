@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Dimensions} from 'react-native';
+import {Dimensions, View} from 'react-native';
 import ModalScreen from '../components/Modal';
 const withModal = Component => {
   const params = {
@@ -9,8 +9,13 @@ const withModal = Component => {
 
   return () => (
     <>
-      <ModalScreen />
+      {/* <ModalScreen /> */}
+
       <Component value={params} />
+
+      <View style={{position: 'absolute', marginTop: 100}}>
+        <ModalScreen />
+      </View>
     </>
   );
 };

@@ -1,5 +1,13 @@
 import React, {useState} from 'react';
-import {Alert, Modal, StyleSheet, Text, Pressable, View} from 'react-native';
+import {
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import useDimensions from '../hooks/useDimensions';
 import {setModalState} from '../store/settings/action';
@@ -8,17 +16,9 @@ import {getModalSate} from '../store/settings/selector';
 const ModalScreen = () => {
   const modalState = useSelector(getModalSate);
   const dispatch = useDispatch();
-  const [screenWidth]: any = useDimensions();
-
-  console.log('modalState', modalState);
-  console.log('screenWidth', typeof screenWidth);
 
   return (
-    <View
-      style={[
-        styles.centeredView,
-        {marginTop: screenWidth ? screenWidth / 2 : 1},
-      ]}>
+    <View style={[styles.centeredView]}>
       <Modal
         animationType="fade"
         transparent={true}
@@ -27,14 +27,21 @@ const ModalScreen = () => {
           Alert.alert('Modal has been closed.');
         }}>
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
+          <View style={[styles.modalView]}>
             <Text style={styles.modalText}>{modalState.message}</Text>
+            {modalState.showIndicator && <ActivityIndicator size="large" />}
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() =>
-                dispatch(setModalState({message: '', showModal: false}))
+                dispatch(
+                  setModalState({
+                    message: '',
+                    showModal: false,
+                    showIndicator: false,
+                  }),
+                )
               }>
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <Text style={styles.textStyle}>Закрыть</Text>
             </Pressable>
           </View>
         </View>
@@ -45,14 +52,17 @@ const ModalScreen = () => {
 
 const styles = StyleSheet.create({
   centeredView: {
-    alignSelf: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalView: {
-    // margin: 20,
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 5,
     padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
@@ -65,7 +75,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   button: {
-    borderRadius: 20,
+    borderRadius: 10,
     padding: 10,
     elevation: 2,
   },

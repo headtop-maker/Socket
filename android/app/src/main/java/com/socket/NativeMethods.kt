@@ -288,6 +288,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                 val out = client.getOutputStream()
                 val bytes = ByteArray(size)
                 var countBytes: Int
+                sendOnUI("client", "sending")
                 do {
                     if (file != null) {
                         countBytes = file.read(bytes)
@@ -298,11 +299,13 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                             sendLoop = false
                             file.close()
                             out.close()
+                            sendOnUI("client", "sent")
                         }
                     }
                 } while (sendLoop)
                 client.close()
             } catch (se: SocketException) {
+                sendOnUI("client", "failure")
                 runOnUiThread(Runnable {
                     Toast.makeText(
                         reactApplicationContext,

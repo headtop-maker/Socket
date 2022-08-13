@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, NativeModules, DeviceEventEmitter} from 'react-native';
+import React from 'react';
+import {View, NativeModules} from 'react-native';
 import {useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 
