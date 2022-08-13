@@ -211,6 +211,21 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                         countBytes = inStream.read()
                         if (countBytes != -1) {
                             outFileStream.write(countBytes)
+                            fileParams.split(":")[2].toInt()
+
+//                            when (i) {
+//                                fileParams.split(":")[2].toInt() * 0,1->Log.d("percent", "10")
+//                                fileParams.split(":")[2].toInt() * 0,2->Log.d("percent", "20")
+//                                fileParams.split(":")[2].toInt() * 0,3->Log.d("percent", "30")
+//                                fileParams.split(":")[2].toInt() * 0,4->Log.d("percent", "40")
+//                                fileParams.split(":")[2].toInt() * 0,5->Log.d("percent", "50")
+//                                fileParams.split(":")[2].toInt() * 0,6->Log.d("percent", "60")
+//                                fileParams.split(":")[2].toInt() * 0,7->Log.d("percent", "70")
+//                                fileParams.split(":")[2].toInt() * 0,8->Log.d("percent", "80")
+//                                fileParams.split(":")[2].toInt() * 0,9->Log.d("percent", "90")
+//                            }
+//                            sendOnUI("status", "loading")
+//                            i++
                         } else {
                             Log.d("URINative", "server receive file")
                             sendOnUI("status", "receive")
@@ -296,10 +311,11 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                             out.write(bytes, 0, countBytes)
                         } else {
                             println("client send file")
+                            sendOnUI("client", "sent")
                             sendLoop = false
                             file.close()
                             out.close()
-                            sendOnUI("client", "sent")
+
                         }
                     }
                 } while (sendLoop)

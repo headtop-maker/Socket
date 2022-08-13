@@ -4,7 +4,10 @@ import {EventsMessages} from '../containers/main/eventsMessages';
 
 const useEventEmitter = (
   eventName: string,
-  actions: {eventMessageName: EventsMessages; eventFunction: () => void}[],
+  actions: {
+    eventMessageName: EventsMessages;
+    eventFunction: (data: any) => void;
+  }[],
 ) => {
   const [eventData, setEventData] = useState('');
 
@@ -12,11 +15,12 @@ const useEventEmitter = (
     DeviceEventEmitter.addListener(eventName, data => {
       setEventData(data);
       if (data.message !== undefined) {
+        console.log('datamessage', data.message);
         const currentFunction = actions.find(
           item => item.eventMessageName === data.message,
         );
         if (currentFunction) {
-          currentFunction.eventFunction();
+          currentFunction.eventFunction(data.message);
         }
       }
     });

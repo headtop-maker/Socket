@@ -3,5 +3,5 @@ export enum EventsMessages {
   loading = 'loading',
   receive = 'receive',
   failure = 'failure',
-  sent = 'sent,',
+  sent = 'sent',
 }

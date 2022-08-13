@@ -49,25 +49,29 @@ const Main = () => {
   const statusActions = [
     {
       eventMessageName: EventsMessages.loading,
-      eventFunction: () =>
+      eventFunction: data => {
         dispatch(
           setModalState({
             message: 'Загружаю',
             showModal: true,
             showIndicator: true,
           }),
-        ),
+        );
+        console.log('thisData', data);
+      },
     },
     {
       eventMessageName: EventsMessages.receive,
-      eventFunction: () =>
+      eventFunction: data => {
         dispatch(
           setModalState({
             message: 'Файл загружен ',
             showModal: true,
             showIndicator: false,
           }),
-        ),
+        );
+        console.log('thisData', data);
+      },
     },
     {
       eventMessageName: EventsMessages.failure,
@@ -96,7 +100,7 @@ const Main = () => {
     },
     {
       eventMessageName: EventsMessages.sent,
-      eventFunction: () => {
+      eventFunction: data => {
         dispatch(
           setModalState({
             message: 'Файл отправлен ',
@@ -105,6 +109,7 @@ const Main = () => {
           }),
         );
         dispatch(clearCurrentFileParamsState());
+        console.log('thisData', data);
       },
     },
     {
