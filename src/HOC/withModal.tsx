@@ -9,13 +9,8 @@ const withModal = Component => {
 
   return () => (
     <>
-      {/* <ModalScreen /> */}
-
       <Component value={params} />
-
-      <View style={{position: 'absolute', marginTop: 100}}>
-        <ModalScreen />
-      </View>
+      <ModalScreen />
     </>
   );
 };
