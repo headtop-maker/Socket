@@ -3,12 +3,13 @@ import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import MainScreen from '../../screens/mainScreen';
 import SCREENS from '../../constants/screen';
-import {View, Text} from 'react-native';
+import {View, Text, NativeModules} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   clearCurrentFileParamsState,
   setConnectionState,
+  setFileDirectory,
   setModalState,
 } from '../../store/settings/action';
 import {getConnectionType, getIpAddress} from '../../store/settings/selector';
@@ -18,6 +19,7 @@ import useEventEmitter from '../../hooks/useEventEmitter';
 import {EventsMessages} from './eventsMessages';
 import {EventsNames} from './eventsNames';
 
+const {NativeMethods} = NativeModules;
 const Stack = createNativeStackNavigator();
 
 const Main = () => {
@@ -70,7 +72,7 @@ const Main = () => {
             showIndicator: false,
           }),
         );
-        console.log('thisData', data);
+        dispatch(setFileDirectory());
       },
     },
     {

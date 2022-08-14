@@ -34,9 +34,7 @@ import java.io.ObjectInputStream
 import android.system.Os.socket
 
 import java.io.InputStream
-
-
-
+import kotlin.io.path.Path
 
 
 class NativeMethods(reactContext: ReactApplicationContext) :
@@ -97,6 +95,11 @@ class NativeMethods(reactContext: ReactApplicationContext) :
         var currentUri = Uri.parse(fileUri)
         Log.d("sendParams", "$serverAddress$fileName$fileType$fileByteSize$fileUri  :  $currentUri")
         clientType("$fileName:$fileType:$fileByteSize",currentUri)
+    }
+
+    @ReactMethod
+    fun getFilesFromPath(successCallback: Callback) {
+        successCallback.invoke(listFile().toString())
     }
 
     @ReactMethod
