@@ -28,7 +28,6 @@ type ContextType = {
 };
 
 const FileIcon: FC<IFileIcon> = ({fileName, fileType, fileByteSize}) => {
-  const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const dispatch = useDispatch();
 
@@ -37,20 +36,16 @@ const FileIcon: FC<IFileIcon> = ({fileName, fileType, fileByteSize}) => {
     ContextType
   >({
     onStart: (event, context) => {
-      context.translateX = translateX.value;
       context.translateY = translateY.value;
     },
     onActive: (event, context) => {
-      translateX.value = event.translationX + context.translateX;
       translateY.value = event.translationY + context.translateY;
     },
     onEnd: event => {
       console.log('translationY', event.translationY, event.translationX);
       if (event.translationY < -100) {
-        translateX.value = withTiming(0);
-        translateY.value = withTiming(-238);
+        translateY.value = withTiming(-300);
       } else {
-        translateX.value = withTiming(0);
         translateY.value = withTiming(0);
       }
     },
@@ -60,9 +55,6 @@ const FileIcon: FC<IFileIcon> = ({fileName, fileType, fileByteSize}) => {
     return {
       transform: [
         {
-          translateX: translateX.value,
-        },
-        {
           translateY: translateY.value,
         },
       ],
@@ -70,13 +62,12 @@ const FileIcon: FC<IFileIcon> = ({fileName, fileType, fileByteSize}) => {
   });
 
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{flex: 1, justifyContent: 'flex-end'}}>
       <PanGestureHandler onGestureEvent={panGestureEvent}>
         <Animated.View style={[styles.container, rStyle]}>
           <View style={styles.svgContainer}>
-            <View style={{position: 'relative'}}>
-              <SvgFile width={100} height={100} />
-            </View>
+            <SvgFile width={100} height={100} />
+
             <Text style={{position: 'absolute', fontSize: 20}}>{fileType}</Text>
           </View>
           <Text>{fileName}</Text>

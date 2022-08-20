@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, NativeModules, TextInput, StyleSheet} from 'react-native';
+import {View, NativeModules, TextInput, Text, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
@@ -25,7 +25,7 @@ type FileParamsType = {
 const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
   const [ipAddress, setIpAddress] = useState('192.168.1.150');
-  const [isLandScape] = useDimensions();
+  const [isLandScape, screenWidth] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const dispatch = useDispatch();
 
@@ -61,12 +61,7 @@ const ClientScreen = () => {
         flexDirection: 'column',
         justifyContent: 'space-around',
       }}>
-      <View
-        style={{
-          flex: 0.5,
-          borderBottomColor: 'black',
-          borderBottomWidth: 1,
-        }}>
+      <View>
         <TextInput
           value={ipAddress}
           onChangeText={setIpAddress}
@@ -76,9 +71,9 @@ const ClientScreen = () => {
       </View>
       <View
         style={{
-          flex: 0.5,
+          flex: 1,
           flexDirection: 'column',
-          justifyContent: 'space-evenly',
+          justifyContent: 'flex-end',
         }}>
         {currentFile !== undefined ? (
           <FileIcon
@@ -99,6 +94,9 @@ const ClientScreen = () => {
           disabled={currentFile === undefined}
         />
       </View>
+      <View style={styles.textDrop}>
+        <Text>Для отправки перемести файл вврех</Text>
+      </View>
     </View>
   );
 };
@@ -107,9 +105,17 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: 'white',
     width: '100%',
-    borderWidth: 1,
     borderRadius: 10,
     padding: 10,
+  },
+  textDrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 export default withModal(ClientScreen);
