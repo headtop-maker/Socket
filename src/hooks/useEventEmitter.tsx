@@ -6,7 +6,7 @@ const useEventEmitter = (
   eventName: string,
   actions: {
     eventMessageName: EventsMessages;
-    eventFunction: (data: any) => void;
+    eventFunction: (data: string) => void;
   }[],
 ) => {
   const [eventData, setEventData] = useState('');

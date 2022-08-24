@@ -1,8 +1,4 @@
-import {ThunkAction} from 'redux-thunk';
 import {IConnectionState, ICurrentFileParams, IModalState} from './types';
-import {NativeModules} from 'react-native';
-
-const {NativeMethods} = NativeModules;
 
 export enum ActionType {
   setAccuracy = 'SET_ACCURACY',
@@ -13,7 +9,7 @@ export enum ActionType {
   setCurrentFileParams = 'SET_CURRENT_FILE_PARAMS',
   clearCurrentFileParams = 'CLEAR_CURRENT_FILE_PARAMS',
   setModalState = 'SET_MODAL_STATE',
-  setFileDirectory = 'SET_FILE_DIRECTORY',
+  getFileDirectory = 'GET_FILE_DIRECTORY',
 }
 
 export const setConnectionState = (data: IConnectionState) => {
@@ -47,15 +43,6 @@ export const setAccuracy = (accuracy: number) => {
   return {
     type: ActionType.setAccuracy,
     payload: accuracy,
-  };
-};
-
-export const setFileDirectory = () => {
-  return (dispatch, getState) => {
-    console.log('dataFile +_');
-    NativeMethods.getFilesFromPath(data => console.log('dataFile', data));
-
-    // dispatch()
   };
 };
 

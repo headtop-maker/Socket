@@ -9,7 +9,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   clearCurrentFileParamsState,
   setConnectionState,
-  setFileDirectory,
   setModalState,
 } from '../../store/settings/action';
 import {getConnectionType, getIpAddress} from '../../store/settings/selector';
@@ -18,6 +17,7 @@ import withModal from '../../HOC/withModal';
 import useEventEmitter from '../../hooks/useEventEmitter';
 import {EventsMessages} from './eventsMessages';
 import {EventsNames} from './eventsNames';
+import {getFileDirectory} from '../../store/filesStore/action';
 
 const {NativeMethods} = NativeModules;
 const Stack = createNativeStackNavigator();
@@ -29,6 +29,7 @@ const Main = () => {
 
   useEffect(() => {
     dispatch(clearCurrentFileParamsState());
+    dispatch(getFileDirectory());
   }, []);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ const Main = () => {
             showIndicator: false,
           }),
         );
-        dispatch(setFileDirectory());
+        dispatch(getFileDirectory());
       },
     },
     {

@@ -6,35 +6,21 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
-import android.os.Message
+
 import android.provider.DocumentsContract
 import android.util.Log
-import android.widget.TextView
 import java.net.ServerSocket
 import kotlin.concurrent.thread
-import com.facebook.react.ReactInstanceManager
 import com.facebook.react.bridge.*
 import java.io.*
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
 import com.facebook.react.bridge.UiThreadUtil.runOnUiThread
-
-import com.th3rdwave.safeareacontext.getReactContext
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import java.net.SocketException
+import com.facebook.react.bridge.Arguments
 
-import java.io.ObjectOutputStream
-import android.system.Os.socket
-
-import java.io.OutputStream
-import java.util.ArrayList
-
-import java.io.ObjectInputStream
-import android.system.Os.socket
-
-import java.io.InputStream
-import kotlin.io.path.Path
 
 
 class NativeMethods(reactContext: ReactApplicationContext) :
@@ -99,8 +85,13 @@ class NativeMethods(reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun getFilesFromPath(successCallback: Callback) {
-        successCallback.invoke(listFile().toString())
+        val arrayFile = Arguments.createArray()
+        listFile()?.forEach { arrayFile.pushString(it.toString())  }
+
+        successCallback.invoke(arrayFile)
+
     }
+
 
     @ReactMethod
     fun openFile(promise: Promise) {

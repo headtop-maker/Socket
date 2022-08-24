@@ -4,12 +4,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import settingsFormReducer from './settings/reducer';
 import {composeWithDevTools} from 'redux-devtools-extension';
 import thunk from 'redux-thunk';
+import filesReducer from './filesStore/reducer';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
 };
-const rootReducer = combineReducers({settingFormData: settingsFormReducer});
+const rootReducer = combineReducers({
+  settingFormData: settingsFormReducer,
+  filesData: filesReducer,
+});
+
 const reducers = persistReducer(persistConfig, rootReducer);
 
 export default () => {
@@ -17,6 +22,7 @@ export default () => {
     reducers,
     composeWithDevTools(applyMiddleware(thunk)),
   );
+
   let persistor = persistStore(store);
   return {store, persistor};
 };
