@@ -3,7 +3,6 @@ import {View, NativeModules, FlatList, StyleSheet, Text} from 'react-native';
 import {useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 
-import withModal from '../../HOC/withModal';
 import {getFiles} from '../../store/filesStore/selector';
 import {getConnectionConnected} from '../../store/settings/selector';
 
@@ -73,4 +72,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
-export default withModal(ServerScreen);
+export default ServerScreen;

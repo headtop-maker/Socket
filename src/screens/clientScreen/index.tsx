@@ -3,7 +3,6 @@ import {View, NativeModules, TextInput, Text, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
-import withModal from '../../HOC/withModal';
 
 import useDimensions from '../../hooks/useDimensions';
 
@@ -25,7 +24,7 @@ type FileParamsType = {
 const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
   const [ipAddress, setIpAddress] = useState('192.168.1.150');
-  const [isLandScape, screenWidth] = useDimensions();
+  const [isLandScape] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const dispatch = useDispatch();
 
@@ -118,4 +117,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-export default withModal(ClientScreen);
+export default ClientScreen;
