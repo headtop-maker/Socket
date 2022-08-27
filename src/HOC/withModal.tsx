@@ -1,5 +1,4 @@
 import React, {useEffect, FC} from 'react';
-import {Dimensions, View} from 'react-native';
 import {useDispatch} from 'react-redux';
 import ModalScreen from '../components/Modal';
 import NetInfo from '@react-native-community/netinfo';

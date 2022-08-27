@@ -1,15 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, NativeModules, TextInput, Text, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
-
 import useDimensions from '../../hooks/useDimensions';
-
 import {setCurrentFileParamsState} from '../../store/settings/action';
 import {
   getConnectionConnected,
   getCurrentFileParams,
+  getIpAddress,
 } from '../../store/settings/selector';
 
 const {NativeMethods} = NativeModules;
@@ -23,7 +22,8 @@ type FileParamsType = {
 
 const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
-  const [ipAddress, setIpAddress] = useState('192.168.1.150');
+  const ipAddressNetInfo = useSelector(getIpAddress);
+  const [ipAddress, setIpAddress] = useState(ipAddressNetInfo);
   const [isLandScape] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const dispatch = useDispatch();
