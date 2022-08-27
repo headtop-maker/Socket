@@ -92,6 +92,12 @@ class NativeMethods(reactContext: ReactApplicationContext) :
 
     }
 
+    private fun availablePort(host: String, port: Int) {
+        val servSocket = Socket(host, port)
+        println("Port in use: $port")
+        Log.d("CHECK_PORT","Port in use: $port")
+        servSocket.close()
+    }
 
     @ReactMethod
     fun openFile(promise: Promise) {
@@ -141,6 +147,8 @@ class NativeMethods(reactContext: ReactApplicationContext) :
     init {
         reactContext.addActivityEventListener(activityEventListener)
     }
+
+
 
     fun listFile(): Array<out File>? {
         val directory = File("/storage/emulated/0/Download/")
