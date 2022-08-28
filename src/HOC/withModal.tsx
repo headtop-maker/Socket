@@ -1,4 +1,4 @@
-import React, {useEffect, FC} from 'react';
+import React, {useEffect, FC, ReactComponentElement, ReactElement} from 'react';
 import {useDispatch} from 'react-redux';
 import ModalScreen from '../components/Modal';
 import NetInfo from '@react-native-community/netinfo';
@@ -7,7 +7,7 @@ import useEventEmitter from '../hooks/useEventEmitter';
 import {EventsNames} from '../containers/main/eventsNames';
 import useEventActions from '../hooks/useEventActions';
 
-const withModal = (WrappedComponent: any) => {
+const withModal = (WrappedComponent: React.ComponentType) => {
   const HOC: FC = props => {
     const dispatch = useDispatch();
     const {statusActions, clientActions} = useEventActions();

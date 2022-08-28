@@ -22,7 +22,6 @@ import java.net.SocketException
 import com.facebook.react.bridge.Arguments
 
 
-
 class NativeMethods(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
     var activity: Activity? = null
@@ -34,7 +33,6 @@ class NativeMethods(reactContext: ReactApplicationContext) :
     var fileParams = ""
     var mEmitter: RCTDeviceEventEmitter? = null
     var serverAddress = ""
-
 
 
     override fun getName(): String {
@@ -76,27 +74,51 @@ class NativeMethods(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun sendFile(serverAddress:String ,  fileName: String, fileType: String, fileByteSize: Int, fileUri: String) {
+    fun sendFile(
+        serverAddress: String,
+        fileName: String,
+        fileType: String,
+        fileByteSize: Int,
+        fileUri: String
+    ) {
         this.serverAddress = serverAddress
         var currentUri = Uri.parse(fileUri)
         Log.d("sendParams", "$serverAddress$fileName$fileType$fileByteSize$fileUri  :  $currentUri")
-        clientType("$fileName:$fileType:$fileByteSize",currentUri)
+        clientType("$fileName:$fileType:$fileByteSize", currentUri)
     }
 
     @ReactMethod
     fun getFilesFromPath(successCallback: Callback) {
         val arrayFile = Arguments.createArray()
-        listFile()?.forEach { arrayFile.pushString(it.toString())  }
+        listFile()?.forEach { arrayFile.pushString(it.toString()) }
 
         successCallback.invoke(arrayFile)
 
     }
 
-    private fun availablePort(host: String, port: Int) {
-        val servSocket = Socket(host, port)
-        println("Port in use: $port")
-        Log.d("CHECK_PORT","Port in use: $port")
-        servSocket.close()
+    private fun availablePort(host: String, port: Int):Boolean {
+
+        return try {
+            val servSocket = Socket(host, port)
+            servSocket.close()
+            true
+        } catch (se: SocketException) {
+            false
+        }
+    }
+
+    @ReactMethod
+    fun discoverServer(currentNet: String) {// работает но очень медленно
+        thread {
+            for (n in 1..254) {
+                try {
+                var checkAddress = "${currentNet}${n}"
+                    val servSocket = Socket(checkAddress, 9999)
+                    Log.d("CHECK_PORT", "server find $servSocket")
+                } catch (se: SocketException) {
+                }
+            }
+        }
     }
 
     @ReactMethod
@@ -133,7 +155,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                     }
                     cursor?.moveToFirst()
                     println(cursor?.getString(2))
-                    fileParams.putString("fileName",cursor?.getString(2)?.split(".")!![0])
+                    fileParams.putString("fileName", cursor?.getString(2)?.split(".")!![0])
                     fileParams.putString("fileType", cursor.getString(2)?.split(".")!![1])
                     fileParams.putInt("fileByteSize", cursor.getString(5).toInt())
                     fileParams.putString("fileUri", uri.toString())
@@ -149,14 +171,13 @@ class NativeMethods(reactContext: ReactApplicationContext) :
     }
 
 
-
     fun listFile(): Array<out File>? {
         val directory = File("/storage/emulated/0/Download/")
         val files = directory.listFiles()
         return files
     }
 
-    fun sendOnUI(eventName: String,message: String){
+    fun sendOnUI(eventName: String, message: String) {
         runOnUiThread(Runnable {
             sendEvent(eventName, message)
         })
@@ -188,7 +209,6 @@ class NativeMethods(reactContext: ReactApplicationContext) :
     }
 
     fun serverFile() {
-        var count: Int = 0
         val server: ServerSocket
         try {
             server = ServerSocket(9999)
@@ -207,27 +227,12 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                             }"
                         )
                     var countBytes: Int
-                    var i = 0;
                     sendOnUI("status", "loading")
                     do {
                         countBytes = inStream.read()
                         if (countBytes != -1) {
                             outFileStream.write(countBytes)
                             fileParams.split(":")[2].toInt()
-
-//                            when (i) {
-//                                fileParams.split(":")[2].toInt() * 0,1->Log.d("percent", "10")
-//                                fileParams.split(":")[2].toInt() * 0,2->Log.d("percent", "20")
-//                                fileParams.split(":")[2].toInt() * 0,3->Log.d("percent", "30")
-//                                fileParams.split(":")[2].toInt() * 0,4->Log.d("percent", "40")
-//                                fileParams.split(":")[2].toInt() * 0,5->Log.d("percent", "50")
-//                                fileParams.split(":")[2].toInt() * 0,6->Log.d("percent", "60")
-//                                fileParams.split(":")[2].toInt() * 0,7->Log.d("percent", "70")
-//                                fileParams.split(":")[2].toInt() * 0,8->Log.d("percent", "80")
-//                                fileParams.split(":")[2].toInt() * 0,9->Log.d("percent", "90")
-//                            }
-//                            sendOnUI("status", "loading")
-//                            i++
                         } else {
                             Log.d("URINative", "server receive file")
                             sendOnUI("status", "receive")
@@ -353,6 +358,7 @@ class NativeMethods(reactContext: ReactApplicationContext) :
                 bufferedWriter.close()
                 client.close()
             } catch (se: SocketException) {
+                sendOnUI("client", "failure")
                 runOnUiThread(Runnable {
                     Toast.makeText(
                         reactApplicationContext,
