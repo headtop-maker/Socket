@@ -31,9 +31,9 @@ export const sendFile = (
     fileUri: string;
   },
 ) => {
-  return async () => {
+  return () => {
     if (currentFile && currentFile.fileName !== undefined) {
-      await NativeMethods.sendFile(
+      NativeMethods.sendFile(
         ipAddress,
         currentFile.fileName,
         currentFile.fileType,

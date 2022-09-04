@@ -10,13 +10,12 @@ const useDimensions = () => {
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({window}) => {
-      setScreenWidth(Math.floor(window.width));
-      setScreenHeigth(Math.floor(window.height));
+      setScreenWidth(window.width);
+      setScreenHeigth(window.height);
       setIsLandScape(window.width > window.height ? true : false);
     });
     return () => subscription?.remove();
   });
-
   return [screenWidth, screenHeigth, isLandScape];
 };
 

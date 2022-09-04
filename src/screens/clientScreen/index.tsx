@@ -3,6 +3,7 @@ import {View, NativeModules, TextInput, Text, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
+import {FileParamsType} from '../../constants/types';
 import useDimensions from '../../hooks/useDimensions';
 import {sendFile} from '../../store/filesStore/action';
 import {setCurrentFileParamsState} from '../../store/settings/action';
@@ -13,13 +14,6 @@ import {
 } from '../../store/settings/selector';
 
 const {NativeMethods} = NativeModules;
-
-type FileParamsType = {
-  fileName: string;
-  fileType: string;
-  fileByteSize: number;
-  fileUri: string;
-};
 
 const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
@@ -61,22 +55,13 @@ const ClientScreen = () => {
           justifyContent: 'flex-end',
         }}>
         {currentFile !== undefined ? (
-          <FileIcon
-            fileByteSize={currentFile.fileByteSize}
-            fileName={currentFile.fileName}
-            fileType={currentFile.fileType}
-          />
+          <FileIcon currentFile={currentFile} ipAddress={ipAddress} />
         ) : null}
 
         <CustomButton
           onPress={openFile}
           title="Выбрать файл"
           disabled={!isConnect && !!ipAddress}
-        />
-        <CustomButton
-          onPress={() => dispatch(sendFile(ipAddress, currentFile))}
-          title="Отправить файл"
-          disabled={currentFile === undefined}
         />
       </View>
       <View style={styles.textDrop}>

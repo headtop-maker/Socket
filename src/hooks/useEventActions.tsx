@@ -80,14 +80,16 @@ const useEventActions = () => {
     },
     {
       eventMessageName: EventsMessages.failure,
-      eventFunction: () =>
+      eventFunction: () => {
         dispatch(
           setModalState({
             message: 'Ошибка клиента',
             showModal: true,
             showIndicator: false,
           }),
-        ),
+        );
+        dispatch(clearCurrentFileParamsState());
+      },
     },
   ];
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import SCREENS from '../../constants/screen';
@@ -9,7 +9,7 @@ const Tab = createMaterialTopTabNavigator();
 
 const MainScreen = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{swipeEnabled: false}}>
       <Tab.Screen
         name={SCREENS.ServerScreen}
         component={ServerScreen}
