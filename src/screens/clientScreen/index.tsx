@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
 import useDimensions from '../../hooks/useDimensions';
+import {sendFile} from '../../store/filesStore/action';
 import {setCurrentFileParamsState} from '../../store/settings/action';
 import {
   getConnectionConnected,
@@ -36,21 +37,6 @@ const ClientScreen = () => {
       console.error(e);
     }
   };
-
-  const sendFile = () => {
-    if (currentFile && currentFile.fileName !== undefined) {
-      NativeMethods.sendFile(
-        ipAddress,
-        currentFile.fileName,
-        currentFile.fileType,
-        currentFile.fileByteSize,
-        currentFile.fileUri,
-      );
-    }
-  };
-
-  console.log('currentFile', currentFile);
-  console.log('isLandScape', isLandScape);
 
   return (
     <View
@@ -88,7 +74,7 @@ const ClientScreen = () => {
           disabled={!isConnect && !!ipAddress}
         />
         <CustomButton
-          onPress={sendFile}
+          onPress={() => dispatch(sendFile(ipAddress, currentFile))}
           title="Отправить файл"
           disabled={currentFile === undefined}
         />
