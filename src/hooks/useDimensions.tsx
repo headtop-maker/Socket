@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Dimensions} from 'react-native';
 
 interface useDimensionsProps {}
@@ -24,12 +24,19 @@ const useDimensions = () => {
     screen.width > screen.height ? true : false,
   );
 
-  useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', ({window}) => {
+  const memoizedCallback = useCallback(
+    (window: {width: number; height: number}) => {
       setScreenWidth(window.width);
       setScreenHeigth(window.height);
       setIsLandScape(window.width > window.height ? true : false);
       setRem(getRem(window.width));
+    },
+    [screenWidth, screenHeigth, isLandScape, rem],
+  );
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({window}) => {
+      memoizedCallback(window);
     });
     return () => subscription?.remove();
   }, []);
