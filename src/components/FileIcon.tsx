@@ -16,6 +16,7 @@ import Animated, {
 import {useDispatch} from 'react-redux';
 import SvgFile from '../assets/icons/svgFile.svg';
 import {FileParamsType} from '../constants/types';
+import useDimensions from '../hooks/useDimensions';
 import {sendFile} from '../store/filesStore/action';
 
 interface IFileIcon {
@@ -31,6 +32,8 @@ const FileIcon: FC<IFileIcon> = ({currentFile, ipAddress}) => {
   const translateY = useSharedValue(0);
   const dispatch = useDispatch();
   const {fileName, fileType, fileByteSize} = currentFile;
+  const [screenHeigth] = useDimensions();
+  console.log(screenHeigth);
 
   const panGestureEvent = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -44,8 +47,8 @@ const FileIcon: FC<IFileIcon> = ({currentFile, ipAddress}) => {
     },
     onEnd: event => {
       console.log('translationY', event.translationY, event.translationX);
-      if (event.translationY < -100) {
-        translateY.value = withTiming(-300);
+      if (event.translationY < -Math.floor(screenHeigth / 6)) {
+        translateY.value = withTiming(-Math.floor(screenHeigth / 1.5));
       } else {
         translateY.value = withTiming(0);
       }
@@ -67,7 +70,7 @@ const FileIcon: FC<IFileIcon> = ({currentFile, ipAddress}) => {
   };
 
   useDerivedValue(() => {
-    if (translateY.value === -300) {
+    if (translateY.value === -Math.floor(screenHeigth / 1.5)) {
       runOnJS(handleSendFile)();
     }
   }, [translateY]);

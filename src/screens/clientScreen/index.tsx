@@ -25,7 +25,6 @@ const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
   const ipAddressNetInfo = useSelector(getIpAddress);
   const [ipAddress, setIpAddress] = useState(ipAddressNetInfo);
-  const [screenWidth, screenHeigth, isLandScape, rem] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const dispatch = useDispatch();
 
@@ -37,8 +36,6 @@ const ClientScreen = () => {
       console.error(e);
     }
   };
-
-  console.log(screenWidth, screenHeigth, isLandScape, rem);
 
   return (
     <View
