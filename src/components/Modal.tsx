@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import useDimensions from '../hooks/useDimensions';
 import {setModalState} from '../store/settings/action';
 import {getModalSate} from '../store/settings/selector';
 

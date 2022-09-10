@@ -1,11 +1,17 @@
-import React, {useState} from 'react';
-import {View, NativeModules, TextInput, Text, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  NativeModules,
+  TextInput,
+  Text,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import CustomButton from '../../components/Buttons/CustomButton';
 import FileIcon from '../../components/FileIcon';
 import {FileParamsType} from '../../constants/types';
 import useDimensions from '../../hooks/useDimensions';
-import {sendFile} from '../../store/filesStore/action';
 import {setCurrentFileParamsState} from '../../store/settings/action';
 import {
   getConnectionConnected,
@@ -19,7 +25,7 @@ const ClientScreen = () => {
   const isConnect = useSelector(getConnectionConnected);
   const ipAddressNetInfo = useSelector(getIpAddress);
   const [ipAddress, setIpAddress] = useState(ipAddressNetInfo);
-  const [isLandScape] = useDimensions();
+  const [screenWidth, screenHeigth, isLandScape, rem] = useDimensions();
   const currentFile = useSelector(getCurrentFileParams);
   const dispatch = useDispatch();
 
@@ -31,6 +37,8 @@ const ClientScreen = () => {
       console.error(e);
     }
   };
+
+  console.log(screenWidth, screenHeigth, isLandScape, rem);
 
   return (
     <View

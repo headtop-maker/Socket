@@ -16,7 +16,6 @@ import Animated, {
 import {useDispatch} from 'react-redux';
 import SvgFile from '../assets/icons/svgFile.svg';
 import {FileParamsType} from '../constants/types';
-import useDimensions from '../hooks/useDimensions';
 import {sendFile} from '../store/filesStore/action';
 
 interface IFileIcon {

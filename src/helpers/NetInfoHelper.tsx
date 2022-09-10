@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {View, Text} from 'react-native';
 import {useDispatch} from 'react-redux';
 import NetInfo from '@react-native-community/netinfo';
 import {setConnectionState} from '../store/settings/action';
