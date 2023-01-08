@@ -17,7 +17,7 @@ const getRem = (width: number) => {
 
 const useDimensions = () => {
   const screen = Dimensions.get('screen');
-  const [rem, setRem] = useState<number>(getRem(screen.width));
+  const [rem, setRem] = useState<number | undefined>(getRem(screen.width));
   const [screenWidth, setScreenWidth] = useState<number>(screen.width);
   const [screenHeigth, setScreenHeigth] = useState<number>(screen.width);
   const [isLandScape, setIsLandScape] = useState(
